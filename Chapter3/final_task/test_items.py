@@ -1,23 +1,24 @@
-import pytest
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
+import time
+
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
 
-def pytest_addoption(parser):
-    parser.addoption('--language', action='store', default='en',
-                     help="Choose language: es, en-gb, ru, fr, etc")
+URL = "http://selenium1py.pythonanywhere.com/catalogue/coders-at-work_207/"
+ADD_TO_BASKET = (By.CSS_SELECTOR, "#add_to_basket_form button[type='submit']")
 
 
-@pytest.fixture(scope="function")
-def browser(request):
-    language = request.config.getoption("language")
-    print("\nstart chrome browser for test..")
+def test_presence_of_btn_to_basket(browser):
+    """Check Add To Basket Button is present"""
+    browser.get(URL)
 
-    options = Options()
-    options.add_experimental_option('prefs', {'intl.accept_languages': language})
-    # options.add_argument("--headless")
-    browser = webdriver.Chrome(options=options)
+    # команда добавлена для визуальной проверки фразы на кнопке добавления в корзину (критерий оценивания)
+    time.sleep(10)
 
-    yield browser
-    print("\nquit browser..")
-    browser.quit()
+    add_to_basket_button = WebDriverWait(browser, 15).until(EC.presence_of_element_located(ADD_TO_BASKET))
+    # browser.execute_script("return arguments[0].scrollIntoView(true);", add_to_basket_button)
+
+    # time.sleep(5)
+
+    assert add_to_basket_button is not None, "Button is not visible"
